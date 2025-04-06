@@ -35,9 +35,19 @@ export function WalletStatus() {
       <Badge className="bg-green-500 text-white">{publicKey ? formatWalletAddress(publicKey) : "Connecté"}</Badge>
 
       {timeoutDisplay && (
-        <Badge variant="outline" className="flex items-center gap-1 bg-yellow-50 text-yellow-700 border-yellow-200">
+        <Badge
+          variant="outline"
+          className={`flex items-center gap-1 ${
+            timeoutRemaining && timeoutRemaining < 60000
+              ? "bg-red-50 text-red-700 border-red-200 animate-pulse"
+              : "bg-yellow-50 text-yellow-700 border-yellow-200"
+          }`}
+        >
           <Clock className="h-3 w-3" />
           {timeoutDisplay}
+          {timeoutRemaining && timeoutRemaining < 60000 && (
+            <span className="ml-1 text-xs font-bold">Session expiration imminent!</span>
+          )}
         </Badge>
       )}
     </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CopyIcon, CheckIcon } from "lucide-react"
+import { CopyIcon, CheckIcon, HistoryIcon } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,16 +10,39 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAppContext } from "@/context/app-context"
 import { Badge } from "@/components/ui/badge"
-// Remplacer l'en-tête existant par HeaderWithWallet
 import { HeaderWithWallet } from "@/components/header-with-wallet"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useWallet } from "@/context/wallet-context"
+
+// Define a payment history type
+interface PaymentHistoryItem {
+  id: string
+  type: "sent" | "received"
+  name: string
+  amount: number
+  subscription: string
+  date: string
+}
 
 export default function PaymentsPage() {
   const { friends, subscriptions } = useAppContext()
+  const { connected } = useWallet()
   const [copied, setCopied] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("crypto")
   const [selectedCrypto, setSelectedCrypto] = useState("SOL")
 
   const walletAddress = "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+
+  // Get payment history from localStorage or use empty array for first-time users
+  const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("ats-payment-history")
+      if (saved) {
+        return JSON.parse(saved)
+      }
+    }
+    return [] // Empty array for first-time users
+  })
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(walletAddress)
@@ -47,9 +70,36 @@ export default function PaymentsPage() {
   const savings = standardFee - cryptoFee
   const savingsPercentage = ((standardFee - cryptoFee) / standardFee) * 100
 
+  const handleSendReminder = (subscriptionId: string, memberId: string) => {
+    toast.success(`Reminder sent to member ${memberId} for subscription ${subscriptionId}!`)
+  }
+
+  // Function to handle sending a payment
+  const handleSendPayment = () => {
+    // In a real app, this would process the payment
+    // For demo purposes, we'll just add it to the payment history
+    const newPayment: PaymentHistoryItem = {
+      id: `payment-${Date.now()}`,
+      type: "sent",
+      name: "Friend",
+      amount: amount,
+      subscription: "Subscription",
+      date: new Date().toLocaleDateString(),
+    }
+
+    const updatedHistory = [...paymentHistory, newPayment]
+    setPaymentHistory(updatedHistory)
+
+    // Save to localStorage
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ats-payment-history", JSON.stringify(updatedHistory))
+    }
+
+    toast.success("Payment sent successfully!")
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      {/* Dans le composant, remplacer le header existant par: */}
       <HeaderWithWallet activePage="payments" />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-gray-50">
         <div className="flex items-center gap-4">
@@ -60,6 +110,7 @@ export default function PaymentsPage() {
             <TabsTrigger value="send">Send Payment</TabsTrigger>
             <TabsTrigger value="receive">Receive Payment</TabsTrigger>
             <TabsTrigger value="history">Payment History</TabsTrigger>
+            <TabsTrigger value="pending">Pending Payments</TabsTrigger>
           </TabsList>
           <TabsContent value="send" className="space-y-4">
             <Card>
@@ -181,10 +232,7 @@ export default function PaymentsPage() {
                   </>
                 )}
 
-                <Button
-                  className="w-full bg-primary text-white hover:bg-primary/90"
-                  onClick={() => toast.success("Payment sent successfully!")}
-                >
+                <Button className="w-full bg-primary text-white hover:bg-primary/90" onClick={handleSendPayment}>
                   Send Payment
                 </Button>
               </CardContent>
@@ -221,38 +269,101 @@ export default function PaymentsPage() {
                 <CardDescription>View all your past payments and receipts</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b pb-4">
-                    <div>
-                      <p className="font-medium">Sent to Alex</p>
-                      <p className="text-sm text-muted-foreground">Netflix - $5.33</p>
+                {paymentHistory.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="flex justify-center mb-4">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                        <HistoryIcon className="h-10 w-10 text-gray-400" />
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-red-500">-$5.33</p>
-                      <p className="text-sm text-muted-foreground">April 10, 2024</p>
-                    </div>
+                    <h3 className="text-xl font-medium ats-accent">No Payment History Yet</h3>
+                    <p className="mt-2 text-gray-500 max-w-md mx-auto">
+                      Your payment history will appear here once you've sent or received payments.
+                    </p>
+                    <Button
+                      className="mt-4 bg-primary text-white hover:bg-primary/90"
+                      onClick={() => document.querySelector('[data-state="inactive"][data-value="send"]')?.click()}
+                    >
+                      Send Your First Payment
+                    </Button>
                   </div>
-                  <div className="flex items-center justify-between border-b pb-4">
-                    <div>
-                      <p className="font-medium">Received from Jamie</p>
-                      <p className="text-sm text-muted-foreground">Spotify Family - $3.75</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-green-500">+$3.75</p>
-                      <p className="text-sm text-muted-foreground">April 5, 2024</p>
-                    </div>
+                ) : (
+                  <div className="space-y-4">
+                    {paymentHistory.map((payment) => (
+                      <div key={payment.id} className="flex items-center justify-between border-b pb-4">
+                        <div>
+                          <p className="font-medium">
+                            {payment.type === "sent" ? `Sent to ${payment.name}` : `Received from ${payment.name}`}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {payment.subscription} - ${payment.amount.toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-medium ${payment.type === "sent" ? "text-red-500" : "text-green-500"}`}>
+                            {payment.type === "sent" ? "-" : "+"}${payment.amount.toFixed(2)}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{payment.date}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between border-b pb-4">
-                    <div>
-                      <p className="font-medium">Received from Taylor</p>
-                      <p className="text-sm text-muted-foreground">Spotify Family - $3.75</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-green-500">+$3.75</p>
-                      <p className="text-sm text-muted-foreground">April 3, 2024</p>
-                    </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="pending" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pending Payments</CardTitle>
+                <CardDescription>These are the payments that are due from your friends.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {subscriptions.flatMap((sub) => sub.members.filter((member) => !member.paid && member.name !== "You"))
+                  .length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-gray-500">No pending payments at the moment.</p>
+                    {subscriptions.length === 0 && (
+                      <p className="mt-2 text-sm text-gray-400">
+                        Add subscriptions and invite friends to see pending payments here.
+                      </p>
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-4">
+                    {subscriptions.flatMap((sub) =>
+                      sub.members
+                        .filter((member) => !member.paid && member.name !== "You")
+                        .map((member) => (
+                          <div
+                            key={`${sub.id}-${member.id}`}
+                            className="flex items-center justify-between border-b pb-4"
+                          >
+                            <div className="flex items-center gap-4">
+                              <Avatar>
+                                <AvatarFallback className="bg-gray-200 text-gray-700">
+                                  {member.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{member.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  {sub.name} - ${member.share.toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="bg-primary text-white hover:bg-primary/90"
+                              onClick={() => handleSendReminder(sub.id, member.id)}
+                            >
+                              Send Reminder
+                            </Button>
+                          </div>
+                        )),
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

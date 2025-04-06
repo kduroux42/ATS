@@ -174,6 +174,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setTimeoutRemaining((prev) => {
           if (prev === null || prev <= 1000) {
             clearInterval(newIntervalId)
+            disconnectWallet()
+            toast.warning("Session expirée")
+
+            // Rediriger vers la page de login
+            if (typeof window !== "undefined") {
+              window.location.href = "/login"
+            }
+
             return null
           }
           return prev - 1000
@@ -186,6 +194,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const newTimeoutId = setTimeout(() => {
         disconnectWallet()
         toast.warning("Session expirée après 10 minutes d'inactivité")
+
+        // Rediriger vers la page de login
+        if (typeof window !== "undefined") {
+          window.location.href = "/login"
+        }
       }, timeout)
 
       setTimeoutId(newTimeoutId)
@@ -217,6 +230,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setTimeoutRemaining((prev) => {
             if (prev === null || prev <= 1000) {
               clearInterval(newIntervalId)
+              disconnectWallet()
+              toast.warning("Session expirée")
+
+              // Rediriger vers la page de login
+              if (typeof window !== "undefined") {
+                window.location.href = "/login"
+              }
+
               return null
             }
             return prev - 1000
@@ -229,6 +250,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const newTimeoutId = setTimeout(() => {
           disconnectWallet()
           toast.warning("Session expirée après 10 minutes d'inactivité")
+
+          // Rediriger vers la page de login
+          if (typeof window !== "undefined") {
+            window.location.href = "/login"
+          }
         }, timeout)
 
         setTimeoutId(newTimeoutId)

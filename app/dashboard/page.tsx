@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Plus } from "lucide-react"
+import { Plus, History } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -34,6 +34,17 @@ export default function DashboardPage() {
   const [isManageModalOpen, setIsManageModalOpen] = useState(false)
   const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false)
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false)
+
+  // Get payment history from localStorage
+  const [paymentHistory, setPaymentHistory] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("ats-payment-history")
+      if (saved) {
+        return JSON.parse(saved)
+      }
+    }
+    return [] // Empty array for first-time users
+  })
 
   // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
   useEffect(() => {
@@ -149,70 +160,94 @@ export default function DashboardPage() {
             </TabsList>
           </div>
           <TabsContent value="active" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {subscriptions.map((subscription) => (
-                <Card key={subscription.id} className="overflow-hidden bg-white">
-                  <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                    <img
-                      alt={subscription.name}
-                      className="rounded-md object-cover"
-                      height="40"
-                      src={subscription.logo || "/placeholder.svg"}
-                      width="40"
-                    />
-                    <div>
-                      <CardTitle>{subscription.name}</CardTitle>
-                      <CardDescription>${subscription.cost}/month</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">Next payment:</span>
-                      <span className="text-sm font-medium">{new Date(subscription.dueDate).toLocaleDateString()}</span>
-                    </div>
-                    <div className="mt-2">
-                      <span className="text-sm text-gray-500">Members:</span>
-                      <div className="mt-1 flex -space-x-2">
-                        {subscription.members.map((member) => (
-                          <Avatar
-                            key={member.id}
-                            className={`border-2 ${member.paid ? "border-green-500" : "border-red-500"}`}
-                          >
-                            <AvatarFallback className="bg-gray-200 text-gray-700">
-                              {member.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button
-                      variant="outline"
-                      className="w-full border-primary/30 text-primary hover:bg-primary/5"
-                      onClick={() => openManageModal(subscription)}
-                    >
-                      Manage
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-              <Card className="flex h-full flex-col items-center justify-center p-6 bg-white">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-                  <Plus className="h-10 w-10 text-gray-400" />
+            {subscriptions.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="flex justify-center mb-4">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                    <Plus className="h-10 w-10 text-gray-400" />
+                  </div>
                 </div>
-                <h3 className="mt-4 text-xl font-medium ats-accent">Add Subscription</h3>
-                <p className="mb-4 mt-2 text-center text-sm text-gray-500">
-                  Add a new subscription to split with your friends.
+                <h3 className="text-xl font-medium ats-accent">No Subscriptions Yet</h3>
+                <p className="mt-2 text-gray-500 max-w-md mx-auto">
+                  You haven't added any subscriptions yet. Add your first subscription to start splitting costs with
+                  friends.
                 </p>
                 <Button
-                  className="bg-primary text-white hover:bg-primary/90"
+                  className="mt-4 bg-primary text-white hover:bg-primary/90"
                   onClick={() => setIsAddSubscriptionOpen(true)}
                 >
-                  Add Subscription
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First Subscription
                 </Button>
-              </Card>
-            </div>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {subscriptions.map((subscription) => (
+                  <Card key={subscription.id} className="overflow-hidden bg-white">
+                    <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                      <img
+                        alt={subscription.name}
+                        className="rounded-md object-cover"
+                        height="40"
+                        src={subscription.logo || "/placeholder.svg"}
+                        width="40"
+                      />
+                      <div>
+                        <CardTitle>{subscription.name}</CardTitle>
+                        <CardDescription>${subscription.cost}/month</CardDescription>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500">Next payment:</span>
+                        <span className="text-sm font-medium">
+                          {new Date(subscription.dueDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="mt-2">
+                        <span className="text-sm text-gray-500">Members:</span>
+                        <div className="mt-1 flex -space-x-2">
+                          {subscription.members.map((member) => (
+                            <Avatar
+                              key={member.id}
+                              className={`border-2 ${member.paid ? "border-green-500" : "border-red-500"}`}
+                            >
+                              <AvatarFallback className="bg-gray-200 text-gray-700">
+                                {member.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button
+                        variant="outline"
+                        className="w-full border-primary/30 text-primary hover:bg-primary/5"
+                        onClick={() => openManageModal(subscription)}
+                      >
+                        Manage
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+                <Card className="flex h-full flex-col items-center justify-center p-6 bg-white">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                    <Plus className="h-10 w-10 text-gray-400" />
+                  </div>
+                  <h3 className="mt-4 text-xl font-medium ats-accent">Add Subscription</h3>
+                  <p className="mb-4 mt-2 text-center text-sm text-gray-500">
+                    Add a new subscription to split with your friends.
+                  </p>
+                  <Button
+                    className="bg-primary text-white hover:bg-primary/90"
+                    onClick={() => setIsAddSubscriptionOpen(true)}
+                  >
+                    Add Subscription
+                  </Button>
+                </Card>
+              </div>
+            )}
           </TabsContent>
           <TabsContent value="pending" className="space-y-4">
             <Card>
@@ -221,36 +256,51 @@ export default function DashboardPage() {
                 <CardDescription>These are the payments that are due from your friends.</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {subscriptions.flatMap((sub) =>
-                    sub.members
-                      .filter((member) => !member.paid && member.name !== "You")
-                      .map((member) => (
-                        <div key={`${sub.id}-${member.id}`} className="flex items-center justify-between border-b pb-4">
-                          <div className="flex items-center gap-4">
-                            <Avatar>
-                              <AvatarFallback className="bg-gray-200 text-gray-700">
-                                {member.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium">{member.name}</p>
-                              <p className="text-sm text-gray-500">
-                                {sub.name} - ${member.share.toFixed(2)}
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            size="sm"
-                            className="bg-primary text-white hover:bg-primary/90"
-                            onClick={() => handleSendReminder(sub.id, member.id)}
+                {subscriptions.flatMap((sub) => sub.members.filter((member) => !member.paid && member.name !== "You"))
+                  .length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-gray-500">No pending payments at the moment.</p>
+                    {subscriptions.length === 0 && (
+                      <p className="mt-2 text-sm text-gray-400">
+                        Add subscriptions and invite friends to see pending payments here.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {subscriptions.flatMap((sub) =>
+                      sub.members
+                        .filter((member) => !member.paid && member.name !== "You")
+                        .map((member) => (
+                          <div
+                            key={`${sub.id}-${member.id}`}
+                            className="flex items-center justify-between border-b pb-4"
                           >
-                            Send Reminder
-                          </Button>
-                        </div>
-                      )),
-                  )}
-                </div>
+                            <div className="flex items-center gap-4">
+                              <Avatar>
+                                <AvatarFallback className="bg-gray-200 text-gray-700">
+                                  {member.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{member.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  {sub.name} - ${member.share.toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="bg-primary text-white hover:bg-primary/90"
+                              onClick={() => handleSendReminder(sub.id, member.id)}
+                            >
+                              Send Reminder
+                            </Button>
+                          </div>
+                        )),
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -258,47 +308,49 @@ export default function DashboardPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Payment History</CardTitle>
-                <CardDescription>View all past payments from your friends.</CardDescription>
+                <CardDescription>View all your past payments and receipts</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b pb-4">
-                    <div className="flex items-center gap-4">
-                      <Avatar>
-                        <AvatarFallback className="bg-gray-200 text-gray-700">A</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">Alex</p>
-                        <p className="text-sm text-gray-500">Netflix - $5.33</p>
+                {paymentHistory.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="flex justify-center mb-4">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                        <History className="h-10 w-10 text-gray-400" />
                       </div>
                     </div>
-                    <div className="text-sm text-gray-500">Paid on April 10, 2024</div>
+                    <h3 className="text-xl font-medium ats-accent">No Payment History Yet</h3>
+                    <p className="mt-2 text-gray-500 max-w-md mx-auto">
+                      Your payment history will appear here once you've sent or received payments.
+                    </p>
+                    <Button
+                      className="mt-4 bg-primary text-white hover:bg-primary/90"
+                      onClick={() => router.push("/dashboard/payments")}
+                    >
+                      Go to Payments
+                    </Button>
                   </div>
-                  <div className="flex items-center justify-between border-b pb-4">
-                    <div className="flex items-center gap-4">
-                      <Avatar>
-                        <AvatarFallback className="bg-gray-200 text-gray-700">J</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">Jamie</p>
-                        <p className="text-sm text-gray-500">Spotify Family - $3.75</p>
+                ) : (
+                  <div className="space-y-4">
+                    {paymentHistory.map((payment) => (
+                      <div key={payment.id} className="flex items-center justify-between border-b pb-4">
+                        <div>
+                          <p className="font-medium">
+                            {payment.type === "sent" ? `Sent to ${payment.name}` : `Received from ${payment.name}`}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {payment.subscription} - ${payment.amount.toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-medium ${payment.type === "sent" ? "text-red-500" : "text-green-500"}`}>
+                            {payment.type === "sent" ? "-" : "+"}${payment.amount.toFixed(2)}
+                          </p>
+                          <p className="text-sm text-gray-500">{payment.date}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-sm text-gray-500">Paid on April 5, 2024</div>
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between border-b pb-4">
-                    <div className="flex items-center gap-4">
-                      <Avatar>
-                        <AvatarFallback className="bg-gray-200 text-gray-700">T</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">Taylor</p>
-                        <p className="text-sm text-gray-500">Spotify Family - $3.75</p>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-500">Paid on April 3, 2024</div>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

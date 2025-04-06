@@ -110,21 +110,40 @@ const initialFriends: Friend[] = [
 ]
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  // In the AppProvider function, modify the useState initializations to check for first-time users
+
   // Try to load from localStorage on initial render
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ats-user-initialized") !== "true"
+    }
+    return true
+  })
+
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("ats-subscriptions")
-      return saved ? JSON.parse(saved) : initialSubscriptions
+      // Only load initial data if not a first-time user and no saved data exists
+      if (saved) {
+        return JSON.parse(saved)
+      } else if (!isFirstTimeUser) {
+        return initialSubscriptions
+      }
     }
-    return initialSubscriptions
+    return [] // Empty array for first-time users
   })
 
   const [friends, setFriends] = useState<Friend[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("ats-friends")
-      return saved ? JSON.parse(saved) : initialFriends
+      // Only load initial data if not a first-time user and no saved data exists
+      if (saved) {
+        return JSON.parse(saved)
+      } else if (!isFirstTimeUser) {
+        return initialFriends
+      }
     }
-    return initialFriends
+    return [] // Empty array for first-time users
   })
 
   // Save to localStorage whenever state changes
@@ -135,6 +154,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem("ats-friends", JSON.stringify(friends))
   }, [friends])
+
+  // Mark user as initialized after first interaction
+  useEffect(() => {
+    if (isFirstTimeUser && (subscriptions.length > 0 || friends.length > 0)) {
+      localStorage.setItem("ats-user-initialized", "true")
+      setIsFirstTimeUser(false)
+    }
+  }, [isFirstTimeUser, subscriptions.length, friends.length])
 
   // Add a new subscription
   const addSubscription = (subscription: Omit<Subscription, "id" | "members">) => {

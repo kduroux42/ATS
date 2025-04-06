@@ -53,68 +53,86 @@ export default function FriendsPage() {
             Add Friend
           </Button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {friends.map((friend) => (
-            <Card key={friend.id}>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarFallback>{friend.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle>{friend.name}</CardTitle>
-                  <CardDescription>{friend.email}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Wallet Address:</span>
-                    <span className="text-sm font-medium">{friend.walletAddress || "Not provided"}</span>
+        {friends.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="flex justify-center mb-4">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                <UserPlus className="h-10 w-10 text-gray-400" />
+              </div>
+            </div>
+            <h3 className="text-xl font-medium ats-accent">No Friends Added Yet</h3>
+            <p className="mt-2 text-gray-500 max-w-md mx-auto">
+              You haven't added any friends yet. Add friends to start splitting subscription costs with them.
+            </p>
+            <Button className="mt-4 bg-primary text-white hover:bg-primary/90" onClick={() => setIsAddFriendOpen(true)}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add Your First Friend
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {friends.map((friend) => (
+              <Card key={friend.id}>
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarFallback>{friend.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle>{friend.name}</CardTitle>
+                    <CardDescription>{friend.email}</CardDescription>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Shared Subscriptions:</span>
-                    <div className="flex flex-wrap gap-1">
-                      {getSubscriptionNames(friend.subscriptions).map((sub) => (
-                        <span
-                          key={sub}
-                          className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
-                        >
-                          {sub}
-                        </span>
-                      ))}
-                      {friend.subscriptions.length === 0 && <span className="text-sm text-gray-500">None</span>}
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Wallet Address:</span>
+                      <span className="text-sm font-medium">{friend.walletAddress || "Not provided"}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Shared Subscriptions:</span>
+                      <div className="flex flex-wrap gap-1">
+                        {getSubscriptionNames(friend.subscriptions).map((sub) => (
+                          <span
+                            key={sub}
+                            className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+                          >
+                            {sub}
+                          </span>
+                        ))}
+                        {friend.subscriptions.length === 0 && <span className="text-sm text-gray-500">None</span>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleRemoveFriend(friend.id)}
-                  className="text-red-500 hover:bg-red-50 hover:text-red-600"
-                >
-                  Remove
-                </Button>
-                <Button variant="outline" size="sm">
-                  Send Payment
-                </Button>
-              </CardFooter>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRemoveFriend(friend.id)}
+                    className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                  >
+                    Remove
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Send Payment
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+            <Card className="flex h-full flex-col items-center justify-center p-6">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+                <Plus className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <h3 className="mt-4 text-xl font-medium">Add Friend</h3>
+              <p className="mb-4 mt-2 text-center text-sm text-muted-foreground">
+                Add a new friend to split subscription costs with.
+              </p>
+              <Button className="bg-primary text-white hover:bg-primary/90" onClick={() => setIsAddFriendOpen(true)}>
+                Add Friend
+              </Button>
             </Card>
-          ))}
-          <Card className="flex h-full flex-col items-center justify-center p-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-              <Plus className="h-10 w-10 text-muted-foreground" />
-            </div>
-            <h3 className="mt-4 text-xl font-medium">Add Friend</h3>
-            <p className="mb-4 mt-2 text-center text-sm text-muted-foreground">
-              Add a new friend to split subscription costs with.
-            </p>
-            <Button className="bg-primary text-white hover:bg-primary/90" onClick={() => setIsAddFriendOpen(true)}>
-              Add Friend
-            </Button>
-          </Card>
-        </div>
+          </div>
+        )}
       </main>
 
       {/* Add Friend Dialog */}
