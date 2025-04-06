@@ -104,16 +104,8 @@
 }
 
 .geometric-bg {
-  background-image: linear-gradient(
-    45deg,
-    rgba(10, 42, 27, 0.03) 25%,
-    rgba(10, 42, 27, 0.05) 25%,
-    rgba(10, 42, 27, 0.05) 50%,
-    rgba(10, 42, 27, 0.03) 50%,
-    rgba(10, 42, 27, 0.03) 75%,
-    rgba(10, 42, 27, 0.05) 75%,
-    rgba(10, 42, 27, 0.05) 100%
-  );
-  background-size: 20px 20px;
+  background-color: rgba(10, 42, 27, 0.03);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%230A2A1B' fill-opacity='0.05'%3E%3Cpath d='M50 25C37.5 25 25 37.5 25 50s12.5 25 25 25 25-12.5 25-25-12.5-25-25-25zm0 40c-8.284 0-15-6.716-15-15 0-8.284 6.716-15 15-15 8.284 0 15 6.716 15 15 0 8.284-6.716 15-15 15z'/%3E%3Cpath d='M50 35v5M50 60v5M35 50h5M60 50h5M50 45v10M45 50h10'/%3E%3Cpath d='M15 15l5 5M80 15l-5 5M15 80l5-5M80 80l-5-5' stroke='%230A2A1B' stroke-opacity='0.05' stroke-width='2'/%3E%3Cpath d='M20 40c-2.5-5-2.5-10 0-15M80 60c2.5 5 2.5 10 0 15' stroke='%230A2A1B' stroke-opacity='0.05' stroke-width='2'/%3E%3Cpath d='M30 20c-5 2.5-10 2.5-15 0M70 80c5-2.5 10-2.5 15 0' stroke='%230A2A1B' stroke-opacity='0.05' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100px 100px;
 }
 

@@ -37,14 +37,24 @@ export default function PaymentsPage() {
     toast.success("Wallet address copied to clipboard")
   }
 
-  // Calculate fee savings with Solana
+  // Définir les frais pour chaque cryptomonnaie
+  const cryptoFees = {
+    BTC: 1.5,
+    ETH: 1.2,
+    USDC: 0.8,
+    SOL: 0.5,
+  }
+
+  // Frais standard (carte de crédit)
   const standardFeePercentage = 2.5
-  const solanaFeePercentage = 0.5
   const amount = 10.0 // Example amount
   const standardFee = amount * (standardFeePercentage / 100)
-  const solanaFee = amount * (solanaFeePercentage / 100)
-  const savings = standardFee - solanaFee
-  const savingsPercentage = ((standardFee - solanaFee) / standardFee) * 100
+
+  // Calculer les frais pour la crypto sélectionnée
+  const selectedFeePercentage = cryptoFees[selectedCrypto as keyof typeof cryptoFees]
+  const cryptoFee = amount * (selectedFeePercentage / 100)
+  const savings = standardFee - cryptoFee
+  const savingsPercentage = ((standardFee - cryptoFee) / standardFee) * 100
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -153,6 +163,7 @@ export default function PaymentsPage() {
                     </Button>
                   </div>
                 </div>
+
                 {paymentMethod === "crypto" && (
                   <div className="rounded-lg border p-4">
                     <p className="text-sm font-medium">Select Cryptocurrency</p>
@@ -162,7 +173,6 @@ export default function PaymentsPage() {
                         className={`justify-start ${selectedCrypto === "BTC" ? "bg-primary text-white hover:bg-primary/90" : ""}`}
                         onClick={() => setSelectedCrypto("BTC")}
                       >
-                        <img src="/placeholder.svg?height=20&width=20" alt="BTC" className="mr-2 h-5 w-5" />
                         Bitcoin (BTC)
                       </Button>
                       <Button
@@ -170,7 +180,6 @@ export default function PaymentsPage() {
                         className={`justify-start ${selectedCrypto === "ETH" ? "bg-primary text-white hover:bg-primary/90" : ""}`}
                         onClick={() => setSelectedCrypto("ETH")}
                       >
-                        <img src="/placeholder.svg?height=20&width=20" alt="ETH" className="mr-2 h-5 w-5" />
                         Ethereum (ETH)
                       </Button>
                       <Button
@@ -178,7 +187,6 @@ export default function PaymentsPage() {
                         className={`justify-start ${selectedCrypto === "USDC" ? "bg-primary text-white hover:bg-primary/90" : ""}`}
                         onClick={() => setSelectedCrypto("USDC")}
                       >
-                        <img src="/placeholder.svg?height=20&width=20" alt="USDC" className="mr-2 h-5 w-5" />
                         USD Coin (USDC)
                       </Button>
                       <Button
@@ -186,44 +194,61 @@ export default function PaymentsPage() {
                         className={`justify-start ${selectedCrypto === "SOL" ? "bg-primary text-white hover:bg-primary/90" : ""}`}
                         onClick={() => setSelectedCrypto("SOL")}
                       >
-                        <img src="/placeholder.svg?height=20&width=20" alt="SOL" className="mr-2 h-5 w-5" />
                         Solana (SOL)
                         <Badge className="ml-2 bg-green-500 text-white">Lowest fees</Badge>
                       </Button>
                     </div>
 
-                    {selectedCrypto === "SOL" && (
-                      <div className="mt-4 rounded-lg border p-3 bg-green-50">
-                        <p className="text-sm font-medium text-green-700">Save on transaction fees with Solana!</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="bg-white">
-                            Standard fee: ${standardFee.toFixed(2)}
-                          </Badge>
-                          <Badge className="bg-green-500">Solana fee: ${solanaFee.toFixed(2)}</Badge>
-                        </div>
-                        <p className="text-xs text-green-600 mt-1">
-                          Save ${savings.toFixed(2)} ({savingsPercentage.toFixed(0)}%) on this transaction!
-                        </p>
+                    <div className="mt-4 rounded-lg border p-3 bg-green-50">
+                      <p className="text-sm font-medium text-green-700">
+                        Save on transaction fees with {selectedCrypto}!
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="bg-white">
+                          Standard fee: ${standardFee.toFixed(2)}
+                        </Badge>
+                        <Badge className="bg-green-500">
+                          {selectedCrypto} fee: ${cryptoFee.toFixed(2)}
+                        </Badge>
                       </div>
-                    )}
-                  </div>
-                )}
-                {paymentMethod === "card" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="cardNumber">Card Number</Label>
-                    <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="expiry">Expiry Date</Label>
-                        <Input id="expiry" placeholder="MM/YY" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cvc">CVC</Label>
-                        <Input id="cvc" placeholder="123" />
-                      </div>
+                      <p className="text-xs text-green-600 mt-1">
+                        Save ${savings.toFixed(2)} ({savingsPercentage.toFixed(0)}%) on this transaction!
+                      </p>
                     </div>
                   </div>
                 )}
+
+                {paymentMethod === "card" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="cardNumber">Card Number</Label>
+                      <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="expiry">Expiry Date</Label>
+                          <Input id="expiry" placeholder="MM/YY" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="cvc">CVC</Label>
+                          <Input id="cvc" placeholder="123" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 rounded-lg border p-3 bg-gray-50">
+                      <p className="text-sm font-medium text-gray-700">Credit Card Processing Fee</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="bg-white">
+                          Standard fee: $0.10
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">
+                        Credit card payments incur a standard processing fee of $0.10 per transaction.
+                      </p>
+                    </div>
+                  </>
+                )}
+
                 <Button
                   className="w-full bg-primary text-white hover:bg-primary/90"
                   onClick={() => toast.success("Payment sent successfully!")}

@@ -86,8 +86,15 @@ export default function DashboardPage() {
 
   // Function to handle deleting a subscription
   const handleDeleteSubscription = (subscriptionId: string) => {
+    // Trouver le nom de la souscription pour le message de confirmation
+    const subscription = subscriptions.find((sub) => sub.id === subscriptionId)
+    const subscriptionName = subscription ? subscription.name : "Subscription"
+
+    // Supprimer la souscription
     removeSubscription(subscriptionId)
-    toast.success("Subscription deleted successfully")
+
+    // Afficher un message de confirmation
+    toast.success(`${subscriptionName} has been deleted successfully`)
   }
 
   // Function to open the manage modal
