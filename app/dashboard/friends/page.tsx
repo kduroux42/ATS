@@ -1,24 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Bell, CreditCard, LogOut, Plus, Settings, User, UserPlus } from "lucide-react"
+import { Plus, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { AddFriendForm } from "@/components/add-friend-form"
 import { useAppContext } from "@/context/app-context"
+import { HeaderWithWallet } from "@/components/header-with-wallet"
 
 export default function FriendsPage() {
   const { friends, subscriptions, addFriend, removeFriend } = useAppContext()
@@ -53,67 +44,7 @@ export default function FriendsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white px-4 md:px-6">
-        <Link className="flex items-center gap-2" href="#">
-          <div className="logo-circle h-8 w-8">
-            <Image src="/images/ats-logo.png" alt="ATS Logo" width={24} height={24} className="object-contain" />
-          </div>
-          <span className="font-bold ats-accent">ATS</span>
-        </Link>
-        <nav className="hidden flex-1 items-center gap-6 md:flex">
-          <Link className="text-sm font-medium text-gray-600 hover:text-gray-900" href="/dashboard">
-            Dashboard
-          </Link>
-          <Link className="text-sm font-medium text-gray-600 hover:text-gray-900" href="/dashboard/payments">
-            Payments
-          </Link>
-          <Link className="text-sm font-medium ats-accent" href="/dashboard/friends">
-            Friends
-          </Link>
-        </nav>
-        <div className="flex flex-1 items-center justify-end gap-4 md:justify-end">
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full border-gray-300 text-gray-700 hover:bg-gray-100"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="sr-only">Notifications</span>
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full border-gray-300 hover:bg-gray-100">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                  <AvatarFallback className="bg-gray-200 text-gray-700">U</AvatarFallback>
-                </Avatar>
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard className="mr-2 h-4 w-4" />
-                <span>Billing</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+      <HeaderWithWallet activePage="friends" />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-gray-50">
         <div className="flex items-center justify-between">
           <h1 className="font-semibold text-lg md:text-2xl">Friends</h1>

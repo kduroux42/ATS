@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { PhantomLogin } from "@/components/phantom-login"
 
 export default function LoginPage() {
   return (
@@ -18,8 +19,11 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold ats-accent">ATS</h1>
           <p className="mt-2 text-gray-600">Split subscription costs with friends using crypto</p>
         </div>
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white">
+        <Tabs defaultValue="wallet" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-white">
+            <TabsTrigger value="wallet" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              Wallet
+            </TabsTrigger>
             <TabsTrigger value="login" className="data-[state=active]:bg-primary data-[state=active]:text-white">
               Login
             </TabsTrigger>
@@ -27,6 +31,9 @@ export default function LoginPage() {
               Register
             </TabsTrigger>
           </TabsList>
+          <TabsContent value="wallet">
+            <PhantomLogin />
+          </TabsContent>
           <TabsContent value="login">
             <Card>
               <CardHeader>

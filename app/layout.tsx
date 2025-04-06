@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ThemeProviderCustom } from "@/components/theme-provider-custom"
 import { AppProvider } from "@/context/app-context"
+import { WalletProvider } from "@/context/wallet-context"
 import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -23,10 +24,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProviderCustom>
-          <AppProvider>
-            {children}
-            <Toaster position="top-center" />
-          </AppProvider>
+          <WalletProvider>
+            <AppProvider>
+              {children}
+              <Toaster position="top-center" />
+            </AppProvider>
+          </WalletProvider>
         </ThemeProviderCustom>
       </body>
     </html>
