@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 150 40% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 150 40% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 40% 10%;
+
+    --primary: 150 45% 11%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 150 45% 11%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 150 20% 40%;
+
+    --accent: 0 0% 96%;
+    --accent-foreground: 150 30% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 150 40% 40%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 150 45% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 150 45% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 45% 11%;
+
+    --primary: 150 45% 11%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 150 45% 11%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 150 20% 40%;
+
+    --accent: 0 0% 96%;
+    --accent-foreground: 150 30% 15%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 150 30% 83%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.logo-circle {
+  border-radius: 50%;
+  background-color: white;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(10, 42, 27, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.logo-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(10, 42, 27, 0.3);
+}
+
+.ats-accent {
+  color: #0a2a1b;
+}
+
+.ats-bg {
+  background-color: #0a2a1b;
+}
+
+.ats-border {
+  border-color: #0a2a1b;
+}
+
+.geometric-bg {
+  background-image: linear-gradient(
+    45deg,
+    rgba(10, 42, 27, 0.03) 25%,
+    rgba(10, 42, 27, 0.05) 25%,
+    rgba(10, 42, 27, 0.05) 50%,
+    rgba(10, 42, 27, 0.03) 50%,
+    rgba(10, 42, 27, 0.03) 75%,
+    rgba(10, 42, 27, 0.05) 75%,
+    rgba(10, 42, 27, 0.05) 100%
+  );
+  background-size: 20px 20px;
+}
+
